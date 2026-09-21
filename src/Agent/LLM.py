@@ -56,7 +56,7 @@ def build_router():
         )
 
     llm = ChatOpenAI(
-        model="YOUR_MODEL_NAME",
+        model="gpt-5.6-luna",
         temperature=0,
     )
 
