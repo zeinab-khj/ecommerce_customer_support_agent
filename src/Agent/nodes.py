@@ -39,3 +39,18 @@ def router_node(state: AgentState, router,) -> dict[str, Any]:
         "route": decision.route,
         "route_reason": decision.reason,
     }
+
+
+
+
+def direct_node( state: AgentState, llm,) -> dict[str, Any]:
+
+    user_request = state["user_request"]
+
+    response = llm.invoke(
+        user_request
+    )
+
+    return {
+        "final_response": response.content,
+    }
