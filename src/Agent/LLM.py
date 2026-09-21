@@ -70,3 +70,20 @@ def build_router():
     router = prompt | llm.with_structured_output(RouteDecision)
 
     return router
+
+
+
+def build_llm():
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "OPENAI_API_KEY environment variable is not set."
+        )
+
+    llm = ChatOpenAI(
+        model="gpt-5.6-luna",
+        temperature=0,
+    )
+
+    return llm
