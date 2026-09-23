@@ -54,3 +54,25 @@ def direct_node( state: AgentState, llm,) -> dict[str, Any]:
     return {
         "final_response": response.content,
     }
+
+
+def retrieve_node(
+    state: AgentState,
+    retriever,
+) -> dict[str, Any]:
+
+    user_request = state["user_request"]
+
+    documents = retriever.invoke(user_request)
+
+    retrieved_documents = [
+        {
+            "content": document.page_content,
+            "metadata": document.metadata,
+        }
+        for document in documents
+    ]
+
+    return {
+        "retrieved_documents": retrieved_documents,
+    }
