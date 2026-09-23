@@ -338,7 +338,6 @@ def guardrail_node(
     }
 
 
-
 def tool_execution_node(
     state: AgentState,
     tool_registry: dict[str, ToolFunction],
@@ -365,7 +364,7 @@ def tool_execution_node(
     except Exception as exc:
         return {
             "tool_result": None,
-            "validation_status": "execution_failed",
+            "execution_status": "failed",
             "escalation_required": True,
             "escalation_reason": (
                 f"Tool execution failed: {exc}"
@@ -374,5 +373,5 @@ def tool_execution_node(
 
     return {
         "tool_result": result,
-        "validation_status": "execution_successful",
+        "execution_status": "successful",
     }
