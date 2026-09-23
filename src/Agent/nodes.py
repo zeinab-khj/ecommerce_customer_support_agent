@@ -24,20 +24,23 @@ def input_guard_node(state: AgentState) -> dict[str, Any]:
         "user_request": user_request,
     }
 
-def router_node(state: AgentState, router,) -> dict[str, Any]:
-    """
-    Determine the high-level route for the user request.
-    """
+def router_node(
+    state: AgentState,
+    router,
+) -> dict[str, Any]:
 
     user_request = state["user_request"]
 
     decision: RouteDecision = router.invoke(
-        user_request
+        {
+            "user_request": user_request
+        }
     )
 
     return {
         "route": decision.route,
         "route_reason": decision.reason,
+        "missing_information": decision.missing_information,
     }
 
 
