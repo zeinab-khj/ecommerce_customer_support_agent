@@ -7,6 +7,7 @@ class AgentState(TypedDict, total=False):
 
     route: str
     route_reason: str
+    missing_information: list[str]
 
     retrieved_documents: list[dict[str, Any]]
 
