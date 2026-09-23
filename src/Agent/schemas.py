@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Any
 
 from .routing import Route
 
@@ -18,4 +19,18 @@ class RouteDecision(BaseModel):
             "Information that is required to proceed but is missing "
             "from the user's request. Empty when nothing is missing."
         ),
+    )
+
+
+class ToolCallDecision(BaseModel):
+    tool_name: str = Field(
+        description="The name of the tool to call."
+    )
+
+    arguments: dict[str, Any] = Field(
+        description="Arguments to pass to the selected tool."
+    )
+
+    reason: str = Field(
+        description="A concise explanation for selecting this tool."
     )
