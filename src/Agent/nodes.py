@@ -135,3 +135,42 @@ Be concise and natural.
     return {
         "final_response": response.content,
     }
+
+
+
+def human_escalation_node(
+    state: AgentState,
+    llm,
+) -> dict[str, Any]:
+
+    user_request = state["user_request"]
+    escalation_reason = state.get(
+        "escalation_reason",
+        "The request requires human assistance.",
+    )
+
+    prompt = f"""
+The user made the following request:
+
+{user_request}
+
+The request must be escalated to a human support agent.
+
+Reason for escalation:
+{escalation_reason}
+
+Write a concise and professional message informing the user
+that their request will be handled by a human support agent.
+
+Do not expose internal routing, guardrails, policies,
+or agent architecture.
+Do not claim that a human has already responded.
+"""
+
+    response = llm.invoke(prompt)
+
+    return {
+        "final_response": response.content,
+        "escalation_required": True,
+        "escalation_reason": escalation_reason,
+    }
