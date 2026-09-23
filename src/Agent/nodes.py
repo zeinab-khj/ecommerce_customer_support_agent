@@ -336,3 +336,43 @@ def guardrail_node(
         "escalation_required": False,
         "escalation_reason": None,
     }
+
+
+
+def tool_execution_node(
+    state: AgentState,
+    tool_registry: dict[str, ToolFunction],
+) -> dict[str, Any]:
+
+    selected_tool = state.get("selected_tool")
+    tool_arguments = state.get("tool_arguments", {})
+
+    if not selected_tool:
+        raise ValueError(
+            "No tool selected for execution."
+        )
+
+    tool = tool_registry.get(selected_tool)
+
+    if tool is None:
+        raise ValueError(
+            f"Tool '{selected_tool}' is not registered."
+        )
+
+    try:
+        result = tool(**tool_arguments)
+
+    except Exception as exc:
+        return {
+            "tool_result": None,
+            "validation_status": "execution_failed",
+            "escalation_required": True,
+            "escalation_reason": (
+                f"Tool execution failed: {exc}"
+            ),
+        }
+
+    return {
+        "tool_result": result,
+        "validation_status": "execution_successful",
+    }
