@@ -174,3 +174,24 @@ Do not claim that a human has already responded.
         "escalation_required": True,
         "escalation_reason": escalation_reason,
     }
+
+
+def tool_selection_node(
+    state: AgentState,
+    tool_selector,
+    available_tools: list[dict[str, Any]],
+) -> dict[str, Any]:
+
+    user_request = state["user_request"]
+
+    decision: ToolCallDecision = tool_selector.invoke(
+        {
+            "user_request": user_request,
+            "available_tools": available_tools,
+        }
+    )
+
+    return {
+        "selected_tool": decision.tool_name,
+        "tool_arguments": decision.arguments,
+    }
