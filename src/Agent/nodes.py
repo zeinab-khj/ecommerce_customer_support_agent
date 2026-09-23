@@ -111,16 +111,21 @@ def clarification_node(
 ) -> dict[str, Any]:
 
     user_request = state["user_request"]
+    missing_information = state.get(
+        "missing_information",
+        [],
+    )
 
     prompt = f"""
-The user wants help with the following request:
+The user made the following request:
 
 {user_request}
 
-The request cannot be completed yet because required information
-is missing.
+The following information is required to proceed:
 
-Ask the user for the minimum information needed to proceed.
+{missing_information}
+
+Ask the user for the minimum missing information needed.
 Do not invent any information.
 Be concise and natural.
 """
