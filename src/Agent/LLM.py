@@ -44,6 +44,9 @@ Important rules:
 5. Use tool for dynamic information or actions.
 6. Use rag for static knowledge.
 7. Use human for sensitive or high-risk cases.
+8. When choosing clarification, identify the minimum information
+   required to proceed and list it in missing_information.
+9. If clarification is not required, return an empty missing_information list.
 """
 
 
