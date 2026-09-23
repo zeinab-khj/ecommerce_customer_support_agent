@@ -195,3 +195,92 @@ def tool_selection_node(
         "selected_tool": decision.tool_name,
         "tool_arguments": decision.arguments,
     }
+
+
+def tool_validation_node(
+    state: AgentState,
+    available_tools: list[dict[str, Any]],
+) -> dict[str, Any]:
+
+    selected_tool = state.get("selected_tool")
+    tool_arguments = state.get("tool_arguments")
+
+    if not selected_tool:
+        return {
+            "validation_status": "invalid",
+            "validation_errors": ["No tool was selected."],
+        }
+
+    if not isinstance(tool_arguments, dict):
+        return {
+            "validation_status": "invalid",
+            "validation_errors": [
+                "Tool arguments must be an object."
+            ],
+        }
+
+    tool_schema = next(
+        (
+            tool
+            for tool in available_tools
+            if tool.get("name") == selected_tool
+        ),
+        None,
+    )
+
+    if tool_schema is None:
+        return {
+            "validation_status": "invalid",
+            "validation_errors": [
+                f"Unknown tool: {selected_tool}"
+            ],
+        }
+
+    parameters = tool_schema.get("parameters", {})
+
+    required_arguments = parameters.get(
+        "required",
+        [],
+    )
+
+    missing_arguments = [
+        argument
+        for argument in required_arguments
+        if argument not in tool_arguments
+    ]
+
+    properties = parameters.get(
+        "properties",
+        {},
+    )
+
+    invalid_arguments = [
+        argument
+        for argument in tool_arguments
+        if argument not in properties
+    ]
+
+    errors = []
+
+    if missing_arguments:
+        errors.extend(
+            [
+                f"Missing required argument: {argument}"
+                for argument in missing_arguments
+            ]
+        )
+
+    if invalid_arguments:
+        errors.extend(
+            [
+                f"Unknown argument: {argument}"
+                for argument in invalid_arguments
+            ]
+        )
+
+    return {
+        "validation_status": (
+            "valid" if not errors else "invalid"
+        ),
+        "validation_errors": errors,
+    }
