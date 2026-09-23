@@ -16,6 +16,7 @@ class AgentState(TypedDict, total=False):
     tool_result: Any
 
     validation_status: str | None
+    validation_errors: list[str]
 
     guardrail_result: str | None
 
