@@ -34,3 +34,13 @@ class ToolCallDecision(BaseModel):
     reason: str = Field(
         description="A concise explanation for selecting this tool."
     )
+
+class ToolValidationResult(BaseModel):
+    valid: bool = Field(
+        description="Whether the tool call is valid."
+    )
+
+    errors: list[str] = Field(
+        default_factory=list,
+        description="Validation errors, if any."
+    )
