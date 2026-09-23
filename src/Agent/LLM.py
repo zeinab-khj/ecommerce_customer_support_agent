@@ -126,3 +126,60 @@ def build_llm():
     response = prompt | llm
 
     return response
+
+
+
+TOOL_SELECTION_SYSTEM_PROMPT = """
+You are the tool-selection component of an e-commerce customer support agent.
+
+Your task is to select the single most appropriate tool for the user's request
+and provide the arguments required by that tool.
+
+Rules:
+1. Select exactly one tool.
+2. Use only the tools provided.
+3. Do not execute the tool.
+4. Do not invent tool names.
+5. Provide arguments using the exact argument names defined by the tool schema.
+6. Do not invent missing information.
+7. If a required argument is missing, leave it absent rather than guessing.
+8. Select the tool that best matches the user's requested action.
+"""
+
+def build_tool_selector():
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "OPENAI_API_KEY environment variable is not set."
+        )
+
+    llm = ChatOpenAI(
+        model="gpt-5.6-luna",
+        temperature=0,
+    )
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                TOOL_SELECTION_SYSTEM_PROMPT,
+            ),
+            (
+                "human",
+                """
+User request:
+{user_request}
+
+Available tools:
+{available_tools}
+""",
+            ),
+        ]
+    )
+
+    tool_selector = prompt | llm.with_structured_output(
+        ToolCallDecision
+    )
+
+    return tool_selector
