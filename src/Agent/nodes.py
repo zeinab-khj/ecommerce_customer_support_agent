@@ -76,3 +76,27 @@ def retrieve_node(
     return {
         "retrieved_documents": retrieved_documents,
     }
+
+
+def generate_response_node(
+    state: AgentState,
+    llm,
+) -> dict[str, Any]:
+
+    response = llm.invoke(
+        {
+            "user_request": state["user_request"],
+            "retrieved_documents": state.get(
+                "retrieved_documents",
+                []
+            ),
+            "tool_result": state.get(
+                "tool_result",
+                None
+            ),
+        }
+    )
+
+    return {
+        "final_response": response.content,
+    }
