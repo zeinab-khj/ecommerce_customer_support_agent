@@ -18,6 +18,8 @@ class AgentState(TypedDict, total=False):
     validation_status: str | None
     validation_errors: list[str]
 
+    execution_status: str | None
+
     guardrail_result: str | None
 
     escalation_required: bool
