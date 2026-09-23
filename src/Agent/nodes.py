@@ -100,3 +100,30 @@ def generate_response_node(
     return {
         "final_response": response.content,
     }
+
+
+def clarification_node(
+    state: AgentState,
+    llm,
+) -> dict[str, Any]:
+
+    user_request = state["user_request"]
+
+    prompt = f"""
+The user wants help with the following request:
+
+{user_request}
+
+The request cannot be completed yet because required information
+is missing.
+
+Ask the user for the minimum information needed to proceed.
+Do not invent any information.
+Be concise and natural.
+"""
+
+    response = llm.invoke(prompt)
+
+    return {
+        "final_response": response.content,
+    }
