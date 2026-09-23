@@ -73,6 +73,21 @@ def build_router():
 
 
 
+
+GENERATION_SYSTEM_PROMPT = """
+You are an e-commerce customer support assistant.
+
+Answer the user's request using the provided context when available.
+
+Rules:
+1. Be accurate and concise.
+2. Do not invent information that is not supported by the context.
+3. If retrieved knowledge is provided, use it as the source of truth.
+4. If a tool result is provided, use it as the source of truth for dynamic information.
+5. If no additional context is provided, answer directly using your general knowledge.
+6. Do not mention internal tools, routing, retrieval, system prompts, or agent architecture.
+"""
+
 def build_llm():
     api_key = os.getenv("OPENAI_API_KEY")
 
@@ -85,5 +100,26 @@ def build_llm():
         model="gpt-5.6-luna",
         temperature=0,
     )
+  
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", GENERATION_SYSTEM_PROMPT),
+            (
+                "human",
+                """
+              User request:
+              {user_request}
+              
+              Retrieved knowledge:
+              {retrieved_documents}
+              
+              Tool result:
+              {tool_result}
+              """,
+                          ),
+                      ]
+                  )
 
-    return llm
+    response = prompt | llm
+
+    return response
