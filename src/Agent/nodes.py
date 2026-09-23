@@ -2,6 +2,11 @@ from typing import Any
 
 from .state import AgentState
 
+from src.guardrails.policies import (
+    ALLOWED_TOOLS,
+    SENSITIVE_TOOLS,
+)
+
 
 def input_guard_node(state: AgentState) -> dict[str, Any]:
     """
@@ -283,4 +288,51 @@ def tool_validation_node(
             "valid" if not errors else "invalid"
         ),
         "validation_errors": errors,
+    }
+
+
+def guardrail_node(
+    state: AgentState,
+) -> dict[str, Any]:
+
+    validation_status = state.get(
+        "validation_status"
+    )
+
+    selected_tool = state.get(
+        "selected_tool"
+    )
+
+    if validation_status != "valid":
+        return {
+            "guardrail_result": "blocked",
+            "escalation_required": True,
+            "escalation_reason": (
+                "Tool call failed validation."
+            ),
+        }
+
+    if selected_tool not in ALLOWED_TOOLS:
+        return {
+            "guardrail_result": "blocked",
+            "escalation_required": True,
+            "escalation_reason": (
+                f"Tool '{selected_tool}' is not allowed."
+            ),
+        }
+
+    if selected_tool in SENSITIVE_TOOLS:
+        return {
+            "guardrail_result": "requires_review",
+            "escalation_required": True,
+            "escalation_reason": (
+                f"Tool '{selected_tool}' requires "
+                "human review."
+            ),
+        }
+
+    return {
+        "guardrail_result": "allowed",
+        "escalation_required": False,
+        "escalation_reason": None,
     }
