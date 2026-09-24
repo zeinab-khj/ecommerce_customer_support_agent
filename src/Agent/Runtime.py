@@ -7,11 +7,11 @@ from .llm import (
     build_tool_selector,
 )
 from ..tools.registry import TOOL_REGISTRY
+from ..tools.schemas import TOOL_SCHEMAS
 
 
 def build_agent(
     retriever: Any,
-    available_tools: list[dict[str, Any]],
 ):
     router = build_router()
     llm = build_llm()
@@ -22,7 +22,7 @@ def build_agent(
         llm=llm,
         retriever=retriever,
         tool_selector=tool_selector,
-        available_tools=available_tools,
+        available_tools=TOOL_SCHEMAS,
         tool_registry=TOOL_REGISTRY,
     )
 
