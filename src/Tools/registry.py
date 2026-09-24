@@ -1,3 +1,5 @@
+from typing import Callable, Any
+
 from .account_tools import update_account
 from .cart_tools import add_to_cart, update_cart_qty
 from .order_tools import (
@@ -17,7 +19,10 @@ from .support_tools import (
 )
 
 
-TOOL_REGISTRY = {
+ToolFunction = Callable[..., Any]
+
+
+TOOL_REGISTRY: dict[str, ToolFunction] = {
     "cancel_order": cancel_order,
     "initiate_exchange": initiate_exchange,
     "get_order_status": get_order_status,
