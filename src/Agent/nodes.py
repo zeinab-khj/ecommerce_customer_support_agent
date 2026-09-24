@@ -7,6 +7,9 @@ from src.guardrails.policies import (
     SENSITIVE_TOOLS,
 )
 
+from guardrails.output import FORBIDDEN_OUTPUT_PATTERNS
+
+
 
 def input_guard_node(state: AgentState) -> dict[str, Any]:
     """
@@ -374,4 +377,69 @@ def tool_execution_node(
     return {
         "tool_result": result,
         "execution_status": "successful",
+    }
+
+
+
+
+def output_guard_node(
+    state: AgentState,
+) -> dict[str, Any]:
+
+    final_response = state.get("final_response")
+
+    if not isinstance(final_response, str):
+        return {
+            "output_guard_result": "blocked",
+            "final_response": (
+                "I’m sorry, but I’m unable to provide a response "
+                "right now. Please contact a human support agent."
+            ),
+        }
+
+    final_response = final_response.strip()
+
+    if not final_response:
+        return {
+            "output_guard_result": "blocked",
+            "final_response": (
+                "I’m sorry, but I’m unable to provide a response "
+                "right now. Please contact a human support agent."
+            ),
+        }
+
+    response_lower = final_response.lower()
+
+    for pattern in FORBIDDEN_OUTPUT_PATTERNS:
+        if pattern.lower() in response_lower:
+            return {
+                "output_guard_result": "blocked",
+                "final_response": (
+                    "I’m sorry, but I’m unable to provide a response "
+                    "right now. Please contact a human support agent."
+                ),
+            }
+
+    if state.get("escalation_required"):
+        misleading_phrases = [
+            "a human agent has responded",
+            "a human agent already responded",
+            "i spoke with a human agent",
+        ]
+
+        if any(
+            phrase in response_lower
+            for phrase in misleading_phrases
+        ):
+            return {
+                "output_guard_result": "blocked",
+                "final_response": (
+                    "Your request has been escalated to a human "
+                    "support agent for further assistance."
+                ),
+            }
+
+    return {
+        "output_guard_result": "passed",
+        "final_response": final_response,
     }
