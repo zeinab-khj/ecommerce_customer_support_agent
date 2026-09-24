@@ -26,3 +26,4 @@ class AgentState(TypedDict, total=False):
     escalation_reason: str | None
 
     final_response: str | None
+    output_guard_result: str | None
