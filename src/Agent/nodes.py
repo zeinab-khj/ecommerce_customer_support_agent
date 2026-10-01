@@ -1,5 +1,6 @@
 from typing import Any
 
+from ..tools.registry import ToolFunction
 from .state import AgentState
 
 from src.guardrails.policies import (
